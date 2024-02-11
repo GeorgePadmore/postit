@@ -5,13 +5,20 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Redirect;
 
 class PostController extends Controller
 {
+    public function index() {
+
+        return view('posts.home', ['posts' => [1,2,3,4]]);
+    }
+
     // Create a post
     public function create(Request $request)
     {
-        $request->validate([
+        $request->validateWithBag('postCreation',[
             'title' => 'required|string',
             'body' => 'required|string',
         ]);
@@ -22,7 +29,9 @@ class PostController extends Controller
         $post->user_id = Auth::id();
         $post->save();
 
-        return response()->json(['message' => 'Post created successfully', 'post' => $post], 201);
+        // return response()->json(['message' => 'Post created successfully', 'post' => $post], 201);
+
+        return Redirect::route('posts.index')->with('status', 'post-created');
     }
 
     // Fetch posts created by the current user
