@@ -7,17 +7,33 @@
 
     <div class="py-12">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    {{-- {{ __("You're logged in!") }} --}}
-                    Create a post
+
+            @if (session('status') === 'post-created')
+                <div class="px-4 py-3 text-teal-900 bg-teal-100 border-t-4 border-teal-500 rounded-b shadow-md" role="alert">
+                    <div class="flex">
+                        <div class="py-1"><svg class="w-6 h-6 mr-4 text-teal-500 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
+                        <div>
+                        <p class="font-bold">Post</p>
+                        <p class="text-sm">Your post has been created!</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            @endif
 
-            {{-- <button id="myBtn">Open Modal</button> --}}
 
-            <x-primary-button x-data=""
-                x-on:click.prevent="$dispatch('open-modal', 'create-post-modal')">{{ __('Create a Post') }}</x-primary-button>
+            @if (Route::has('login'))
+                @auth
+                    <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg" x-data=""
+                        x-on:click.prevent="$dispatch('open-modal', 'create-post-modal')">
+                        <div class="p-6 text-gray-900 dark:text-gray-100">
+                            Create a post
+                        </div>
+                    </div>
+                @endauth
+            @endif
+
+            {{-- <x-primary-button x-data=""
+                x-on:click.prevent="$dispatch('open-modal', 'create-post-modal')">{{ __('Create a Post') }}</x-primary-button> --}}
 
         </div><br><br>
 
@@ -59,30 +75,15 @@
                     </x-primary-button>
                 </div>
 
-                <div class="flex items-center gap-4">
-
-                    @if (session('status') === 'post-created')
-                        <p
-                            x-data="{ show: true }"
-                            x-show="show"
-                            x-transition
-                            x-init="setTimeout(() => show = false, 2000)"
-                            class="text-sm text-gray-600 dark:text-gray-400"
-                        >{{ __('Saved.') }}</p>
-                    @endif
-                </div>
-
-
             </form>
         </x-modal>
 
 
         
 
-
         @if ($posts)
             @foreach ($posts as $post)
-                {{-- Posts section --}}
+                {{-- Posts section --}}                
                 <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div class="bg-white h-50 sm:py-2 ">
                         <div class="mt-6 space-y-12 lg:flex lg:gap-x-6 lg:space-y-0">
@@ -105,8 +106,7 @@
 
                             <!-- Second column -->
                             <div class="relative group lg:w-3/7">
-                                <p class="text-base font-semibold text-gray-900">Journals and note-taking
-                                    Self-Improvement Journals</p>
+                                <p class="text-base font-semibold text-gray-900">{{ $post->title}}</p>
                                 <p class="text-base text-gray-500">
                                     Journals and note-taking Self-Improvement Journals and note-taking Journals and
                                     note-taking Journals and
@@ -133,34 +133,6 @@
             @endforeach
         @endif
 
-
     </div>
 
-    <script>
-        // Get the modal
-        var modal = document.getElementById("myModal");
-
-        // Get the button that opens the modal
-        var btn = document.getElementById("myBtn");
-
-        // Get the <span> element that closes the modal
-        var span = document.getElementsByClassName("close")[0];
-
-        // When the user clicks on the button, open the modal
-        btn.onclick = function() {
-            modal.style.display = "block";
-        }
-
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
-            modal.style.display = "none";
-        }
-
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
-    </script>
 </x-app-layout>

@@ -10,9 +10,31 @@ use Illuminate\Support\Facades\Redirect;
 
 class PostController extends Controller
 {
+
+    private function getActivePosts(){
+        $posts = Post::where([
+             ['active_status', true], ['del_status', false]
+        ]);
+        // ->orderBy('created_at','DESC')->get();
+
+        return $posts;
+    }
+    
+
+    // Fetch posts created by the current user
+    public function userPosts()
+    {
+        $posts = Post::where([
+                    ['user_id', Auth::id()], ['active_status', true], ['del_status', false]
+                ])->orderBy('created_at','DESC')->get();
+        return response()->json(['posts' => $posts], 200);
+    }
+
+
     public function index() {
 
-        return view('posts.home', ['posts' => [1,2,3,4]]);
+        $posts = $this->getActivePosts()->orderBy('created_at','DESC')->get();
+        return view('posts.home', ['posts' => $posts]);
     }
 
     // Create a post
@@ -32,20 +54,6 @@ class PostController extends Controller
         // return response()->json(['message' => 'Post created successfully', 'post' => $post], 201);
 
         return Redirect::route('posts.index')->with('status', 'post-created');
-    }
-
-    // Fetch posts created by the current user
-    public function userPosts()
-    {
-        $posts = Post::where('user_id', Auth::id())->get();
-        return response()->json(['posts' => $posts], 200);
-    }
-
-    // Fetch all posts
-    public function allPosts()
-    {
-        $posts = Post::all();
-        return response()->json(['posts' => $posts], 200);
     }
 
     // Search posts by title, body or comments
