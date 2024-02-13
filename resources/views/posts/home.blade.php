@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div class="pb-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
 
             @if (session('status') === 'post-created')
                 <div class="px-4 py-3 text-teal-900 bg-teal-100 border-t-4 border-teal-500 rounded-b shadow-md"
@@ -40,7 +40,7 @@
             {{-- <x-primary-button x-data=""
                 x-on:click.prevent="$dispatch('open-modal', 'create-post-modal')">{{ __('Create a Post') }}</x-primary-button> --}}
 
-        </div><br><br>
+        </div>
 
 
         <x-modal name="create-post-modal" :show="$errors->postCreation->isNotEmpty()" focusable>
@@ -132,7 +132,7 @@
         @if ($posts)
             @foreach ($posts as $post)
                 {{-- Posts section --}}
-                <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div class="px-4 pb-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div class="w-full bg-white h-50 sm:py-2 max-w-screen">
                         <div class="mt-6 space-y-12 lg:flex lg:gap-x-6 lg:space-y-0">
                             <!-- First column -->
@@ -161,14 +161,14 @@
 
                             <!-- Second column -->
                             <div class="relative group lg:w-4/7">
-                                <p class="text-base font-semibold text-gray-900">{{ $post->title }}</p>
-                                <p class="text-base text-gray-500">
-                                    Journals and note-taking Self-Improvement Journals and note-taking Journals and
-                                    note-taking Journals and
-                                    note-taking Journals
-                                </p>
+                                <a href="{{ route('posts.details', ['id' => $post->id]) }}" class="text-base font-semibold text-gray-900">
+                                    {{ $post->title }}
+                                </a>
 
-                                <br>
+                                <p class="pb-3 text-base text-gray-500">
+                                    {{ $post->body}}
+                                </p>
+                                
                                 <div class="flex items-center">
                                     
 
@@ -238,7 +238,7 @@
                         </div>
 
                     </div>
-                </div><br>
+                </div>
             @endforeach
         @endif
 

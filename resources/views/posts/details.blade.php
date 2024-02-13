@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div class="pb-5 mx-auto max-w-7xl sm:px-6 lg:px-8">
 
             @if (session('status') === 'post-created')
                 <div class="px-4 py-3 text-teal-900 bg-teal-100 border-t-4 border-teal-500 rounded-b shadow-md"
@@ -26,7 +26,7 @@
             @endif
 
 
-        </div><br><br>
+        </div>
 
 
         <x-modal name="create-post-modal" :show="$errors->postCreation->isNotEmpty()" focusable>
@@ -74,7 +74,7 @@
 
         @if ($post)
             {{-- Posts section --}}
-            <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div class="px-4 pb-2 mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="w-full bg-white h-50 sm:py-2 max-w-screen">
                     <div class="mt-6 space-y-12 lg:flex lg:gap-x-6 lg:space-y-0">
                         <!-- First column -->
@@ -103,14 +103,10 @@
 
                         <!-- Second column -->
                         <div class="relative group lg:w-4/7">
+                        
                             <p class="text-base font-semibold text-gray-900">{{ $post->title }}</p>
-                            <p class="text-base text-gray-500">
-                                Journals and note-taking Self-Improvement Journals and note-taking Journals and
-                                note-taking Journals and
-                                note-taking Journals
-                            </p>
+                            <p class="pb-5 text-base text-gray-500"> {{ $post->body }} </p>
 
-                            <br>
                             <div class="flex items-center">
                                 <a href="{{ route('posts.details', ['id' => $post->id]) }}"
                                     class="flex items-center mr-4 hover:text-blue-500">
@@ -157,13 +153,12 @@
                     </div>
 
                 </div>
-            </div><br>
+            </div>
 
             @if ($post->comments)
 
                 @foreach ($post->comments as $comment)
-                    {{-- {{$comment}} --}}
-                    <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    <div class="px-4 pb-5 mx-auto max-w-7xl sm:px-6 lg:px-8">
                         <div class="w-full bg-white h-50 sm:py-2 max-w-screen">
                             <div class="mt-6 space-y-12 lg:flex lg:gap-x-6 lg:space-y-0">
                                 <!-- First column -->
@@ -192,23 +187,10 @@
 
                                 <!-- Second column -->
                                 <div class="relative group lg:w-4/7">
-                                    {{-- <p class="text-base font-semibold text-gray-900">{{ $post->title }}</p> --}}
-                                    <p class="text-base text-gray-500">
-                                        {{$comment->text}}
-                                    </p>
+                                    <p class="text-base text-gray-500 pb-7"> {{$comment->text}} </p>
 
-                                    <br>
                                     <div class="flex items-center">
-                                        {{-- <a href="{{ route('posts.details', ['id' => $post->id]) }}"
-                                            class="flex items-center mr-4 hover:text-blue-500">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 0 1 1.037-.443 48.282 48.282 0 0 0 5.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
-                                            </svg>
-                                            <p class="text-sm text-gray-500">1,568 Comments</p>
-                                        </a> --}}
-
+                                 
                                         <div class="flex items-center mr-4">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                 stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -238,17 +220,15 @@
                             </div>
 
                         </div>
-                    </div><br>
+                    </div>
                 @endforeach
 
-                
-                
             @else
                 
             @endif
 
             {{-- Comment section --}}
-            <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div class="px-4 pb-5 mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="w-full bg-white h-50 sm:py-2 max-w-screen">
                     <div class="mt-6 space-y-12 lg:flex lg:gap-x-6 lg:space-y-0">
                         <!-- First column -->
@@ -275,7 +255,7 @@
                         </div>
 
                         <!-- Second column -->
-                        <div class="relative group lg:w-10/12 ">
+                        <div class="relative pb-2 group lg:w-10/12">
 
                             <form method="post" action="{{ route('comments.add', ['postId' => $post->id]) }}">
                                 @csrf
@@ -300,19 +280,13 @@
 
                             </form>
 
-
-                            <br>
-
                         </div>
-
-                        {{-- <div class="relative group lg:w-1/7"></div> --}}
-
 
                     </div>
 
                 </div>
             </div>
-            <br>
+            
         @endif
 
     </div>
