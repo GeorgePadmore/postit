@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +36,9 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
+Route::get('/posts/details/{id}', [PostController::class, 'details'])->name('posts.details');
 Route::post('/posts', [PostController::class, 'create'])->name('posts.create');
+
+Route::post('/posts/{postId}/comments/add', [CommentController::class, 'add'])->name('comments.add');
 
 require __DIR__.'/auth.php';

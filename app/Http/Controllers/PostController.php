@@ -7,6 +7,7 @@ use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 {
@@ -55,6 +56,7 @@ class PostController extends Controller
 
         return Redirect::route('posts.index')->with('status', 'post-created');
     }
+    
 
     // Search posts by title, body or comments
     public function search(Request $request)
@@ -68,6 +70,36 @@ class PostController extends Controller
                      ->get();
         return response()->json(['posts' => $posts], 200);
     }
+
+
+
+    public function details($id)
+    {
+        // Define validation rules
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|integer|exists:posts,id',
+        ]);
+
+        // Check if validation fails
+        if ($validator->fails()) {
+            // Redirect back or return error response as needed
+            // For example, redirecting back with errors
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        // Validation passed, proceed with retrieving the post
+        $post = $this->getActivePosts()->find($id);
+
+        if (!$post) {
+            // Post not found, handle the error (e.g., return 404)
+            abort(404);
+        }
+
+        // dd($post);
+
+        return view('posts.details', ['post' => $post]);
+    }
+
 
     // Edit a post
     public function edit(Request $request, $id)
