@@ -141,7 +141,7 @@
                                 <div
                                     class="relative w-10 h-2 overflow-hidden bg-white rounded-lg group-hover:opacity-75 sm:h-10">
                                     @if ($post->user->profile_pic_url !== null)
-                                        <img src={{ $post->user->profile_pic_url }}
+                                        <img src="{{ Storage::url($post->user->profile_pic_url) }}"
                                             alt="Desk with leather desk pad, walnut desk organizer, wireless keyboard and mouse, and porcelain mug."
                                             class="object-cover object-center ">
                                     @else
@@ -155,6 +155,7 @@
                                     <a href="#">
                                         <span class="absolute inset-0"></span>
                                         {{ $post->user->name }}
+
                                     </a>
                                 </h3>
                             </div>
