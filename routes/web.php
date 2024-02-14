@@ -41,4 +41,10 @@ Route::post('/posts', [PostController::class, 'create'])->name('posts.create');
 
 Route::post('/posts/{postId}/comments/add', [CommentController::class, 'add'])->name('comments.add');
 
+Route::post('/posts/{postId}/like/add', [PostController::class, 'likePost'])->name('posts.likePost');
+Route::post('/posts/{postId}/like/remove', [PostController::class, 'unlikePost'])->name('posts.unlikePost');
+
+Route::post('/comments/{commentId}/like/add', [CommentController::class, 'likeComment'])->name('comments.likeComment');
+Route::post('/comments/{commentId}/like/remove', [CommentController::class, 'unlikeComment'])->name('comments.unlikeComment');
+
 require __DIR__.'/auth.php';

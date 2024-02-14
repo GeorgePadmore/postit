@@ -4,21 +4,46 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Post;
+use App\Models\PostLike;
+use App\Models\PostLikeCount;
+use App\Models\CommentLike;
+use App\Models\CommentLikeCount;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
+use Mockery\Undefined;
 
 class PostController extends Controller
 {
 
     private function getActivePosts(){
-        $posts = Post::where([
-             ['active_status', true], ['del_status', false]
-        ]);
-        // ->orderBy('created_at','DESC')->get();
+        return Post::select('posts.*', 'post_likes_count.total_likes')
+            ->leftJoin('post_likes_count', 'posts.id', '=', 'post_likes_count.post_id')
+            ->where([
+                ['posts.active_status', true],
+                ['posts.del_status', false]
+            ]);
+    }
+    
+    private function getPostLikeCount($postId){
+        return PostLikeCount::where([
+             ['post_id', $postId]
+        ])->first();
+    }
 
-        return $posts;
+    private function getUserPostLike($postId){
+        return PostLike::where([
+             ['post_id', $postId], ['user_id', Auth::id()]
+        ])->first();
+    }
+
+
+    private function getUserCommentLike($commentId){
+        return CommentLike::where([
+             ['comment_id', $commentId], ['user_id', Auth::id()]
+        ])->first();
     }
     
 
@@ -34,7 +59,13 @@ class PostController extends Controller
 
     public function index() {
 
-        $posts = $this->getActivePosts()->orderBy('created_at','DESC')->get();
+        $posts = $this->getActivePosts()->orderBy('posts.created_at','DESC')->get();
+
+        // Iterate through each post and check if the current user has liked it
+        $posts->each(function ($post) {
+            $post->liked_by_user = $this->getUserPostLike($post->id) !== null;
+        });
+
         return view('posts.home', ['posts' => $posts]);
     }
 
@@ -90,12 +121,22 @@ class PostController extends Controller
         // Validation passed, proceed with retrieving the post
         $post = $this->getActivePosts()->find($id);
 
+        // check if the current user has liked it
+        $post->liked_by_user = $this->getUserPostLike($post->id) !== null;
+
+
+         // Iterate through each comment and check if the current user has liked it
+         $post->comments->each(function ($comment) {
+            $comment->liked_by_user = $this->getUserCommentLike($comment->id) !== null;
+            $comment->total_likes = ($comment->likesCount) ? $comment->likesCount->total_likes : 0;
+        });
+
+
         if (!$post) {
+            dd("An error occured");
             // Post not found, handle the error (e.g., return 404)
             abort(404);
         }
-
-        // dd($post);
 
         return view('posts.details', ['post' => $post]);
     }
@@ -130,5 +171,96 @@ class PostController extends Controller
         }
         $post->delete();
         return response()->json(['message' => 'Post deleted successfully'], 200);
+    }
+
+
+
+
+    public function likePost($postId)
+    {
+        // Start a database transaction
+        DB::beginTransaction();
+
+        try {
+            // Check if the post exists
+            $post = Post::findOrFail($postId);
+
+            // Check if the user has already liked the post
+            $existingLike = PostLike::where('user_id', Auth::id())->where('post_id', $postId)->first();
+
+            if ($existingLike) {
+                return response()->json(['message' => 'You have already liked this post'], 400);
+            }
+
+            // Add a like for the post
+            PostLike::create([
+                'user_id' => Auth::id(),
+                'post_id' => $postId,
+            ]);
+
+            $postLike = $this->getPostLikeCount($postId);
+
+            if($postLike == null){
+                PostLikeCount::create([ 'post_id' => $postId, 'total_likes' => 1 ]);
+            }else{
+                // Update the total likes count for the post
+                PostLikeCount::where([
+                    ['post_id', $postId],
+                ])->update(['total_likes' => DB::raw('total_likes + 1')]);
+            }
+
+            // Commit the transaction
+            DB::commit();
+
+            // Redirect to the posts index page
+            $posts = $this->getActivePosts()->orderBy('posts.created_at','DESC')->get();
+            return Redirect::route('posts.index')->with('posts', $posts);
+        } catch (\Exception $e) {
+            // Something went wrong, rollback the transaction
+            DB::rollback();
+            // Handle the exception as needed
+            return response()->json(['error' => 'An error occurred while processing the request'], 500);
+        }
+
+    }
+
+
+
+    // Unlike a post
+    public function unlikePost($postId)
+    {
+         // Start a database transaction
+        DB::beginTransaction();
+
+        try {
+
+            // Check if the user has liked the post
+            $existingLike = PostLike::where('user_id', Auth::id())->where('post_id', $postId)->first();
+
+            if (!$existingLike) {
+                return response()->json(['message' => 'You have not liked this post'], 400);
+            }
+
+            // Remove the like for the post
+            $existingLike->delete();
+
+            // Update the total likes count for the post
+            $likeCount = PostLikeCount::where('post_id', $postId)->first();
+            if ($likeCount) {
+                $likeCount->update(['total_likes' => DB::raw('total_likes - 1')]);
+            }
+
+            // Commit the transaction
+            DB::commit();
+
+            // Redirect to the posts index page
+            $posts = $this->getActivePosts()->orderBy('posts.created_at','DESC')->get();
+            return Redirect::route('posts.index')->with('posts', $posts);
+        } catch (\Exception $e) {
+            // Something went wrong, rollback the transaction
+            DB::rollback();
+            // Handle the exception as needed
+            return response()->json(['error' => 'An error occurred while processing the request'], 500);
+        }
     }
 }

@@ -21,4 +21,9 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function likesCount()
+    {
+        return $this->hasOne(PostLikeCount::class, 'post_id');
+    }
+
 }

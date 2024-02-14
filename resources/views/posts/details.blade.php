@@ -124,15 +124,45 @@
                                     </p>
                                 </a>
 
-                                {{-- <div class="flex items-center mr-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z" />
-                                    </svg>
+                                @if ($post->liked_by_user)
+                                            
+                                    <form action="{{ route('posts.unlikePost', ['postId' => $post->id]) }}" method="POST" class="flex items-center mr-4">
+                                        @csrf
+                                        <button type="submit">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 fill-blue-500">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z" />
+                                            </svg>
+                                        </button>
 
-                                    <p class="text-sm text-gray-500">1,568 Likes</p>
-                                </div> --}}
+                                        <p class="text-sm text-gray-500">
+                                            @if ($post->total_likes == null)
+                                                0 Like
+                                            @else
+                                                {{ $post->total_likes }} Likes
+                                            @endif
+                                        </p>
+                                    </form>
+
+                                @else
+
+                                    <form action="{{ route('posts.likePost', ['postId' => $post->id]) }}" method="POST" class="flex items-center mr-4">
+                                        @csrf
+                                        <button type="submit">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z" />
+                                            </svg>
+                                        </button>
+
+                                        <p class="text-sm text-gray-500">
+                                            @if ($post->total_likes == null)
+                                                0 Like
+                                            @else
+                                                {{ $post->total_likes }} Likes
+                                            @endif
+                                        </p>
+                                    </form>
+                                    
+                                @endif
 
                                 <div class="flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -192,13 +222,49 @@
                                     <div class="flex items-center">
                                  
                                         <div class="flex items-center mr-4">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z" />
-                                            </svg>
+                                            
+                                            @if ($comment->liked_by_user)
+                                            
+                                                <form action="{{ route('comments.unlikeComment', ['commentId' => $comment->id]) }}" method="POST" class="flex items-center mr-4">
+                                                    @csrf
+                                                    <button type="submit">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 fill-blue-500">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z" />
+                                                        </svg>
+                                                    </button>
 
-                                            <p class="text-sm text-gray-500">1,568 Likes</p>
+                                                    <p class="text-sm text-gray-500">
+                                                        @if ($comment->total_likes == null)
+                                                            0 Like
+                                                        @else
+                                                            {{ $comment->total_likes }} Likes
+                                                        @endif
+                                                    </p>
+                                                </form>
+
+                                            @else
+
+                                                <form action="{{ route('comments.likeComment', ['commentId' => $comment->id]) }}" method="POST" class="flex items-center mr-4">
+                                                    @csrf
+                                                    <button type="submit">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z" />
+                                                        </svg>
+                                                    </button>
+
+                                                    <p class="text-sm text-gray-500">
+                                                        @if ($comment->total_likes == null)
+                                                            0 Like
+                                                        @else
+                                                            {{ $comment->total_likes }} Likes
+                                                        @endif
+                                                    </p>
+                                                </form>
+                                                
+                                            @endif
+
+
+
                                         </div>
 
                                         <div class="flex items-center">
@@ -224,68 +290,136 @@
                 @endforeach
 
             @else
+
+                {{-- Show no record found --}}
                 
             @endif
 
-            {{-- Comment section --}}
-            <div class="px-4 pb-5 mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="w-full bg-white h-50 sm:py-2 max-w-screen">
-                    <div class="mt-6 space-y-12 lg:flex lg:gap-x-6 lg:space-y-0">
-                        <!-- First column -->
-                        <div class="relative group lg:w-1/7"></div>
-                        <div class="relative group lg:w-2/7">
-                            <div
-                                class="relative w-10 h-2 overflow-hidden bg-white rounded-lg group-hover:opacity-75 sm:h-10">
-                                @if (Auth::user()->profile_pic_url)
-                                    <img src={{ Auth::user()->profile_pic_url }}
-                                        alt="Desk with leather desk pad, walnut desk organizer, wireless keyboard and mouse, and porcelain mug."
-                                        class="object-cover object-center">
-                                @else
-                                    <img src="https://tailwindui.com/img/ecommerce-images/home-page-02-edition-01.jpg"
-                                        alt="Desk with leather desk pad, walnut desk organizer, wireless keyboard and mouse, and porcelain mug."
-                                        class="object-cover object-center">
-                                @endif
-                            </div>
-                            <h3 class="mt-6 text-sm text-gray-500">
-                                <a href="#">
-                                    <span class="absolute inset-0"></span>
-                                    {{ Auth::user()->name }}
-                                </a>
-                            </h3>
-                        </div>
+            {{-- Write Comment section --}}
 
-                        <!-- Second column -->
-                        <div class="relative pb-2 group lg:w-10/12">
+            @if (Auth::check())
 
-                            <form method="post" action="{{ route('comments.add', ['postId' => $post->id]) }}">
-                                @csrf
-                                @method('post')
-
-                                <div>
-                                    <x-text-area id="text" name="text" type="text" class="block w-full h-40 mt-1" placeholder="{{ __('Comment') }}" />
-
-                                    <x-input-error :messages="$errors->commentCreation->get('text')" class="mt-2" />
+                <div class="px-4 pb-5 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    <div class="w-full bg-white h-50 sm:py-2 max-w-screen">
+                        <div class="mt-6 space-y-12 lg:flex lg:gap-x-6 lg:space-y-0">
+                            <!-- First column -->
+                            <div class="relative group lg:w-1/7"></div>
+                            <div class="relative group lg:w-2/7">
+                                <div class="relative w-10 h-2 overflow-hidden bg-white rounded-lg group-hover:opacity-75 sm:h-10">
+                                    @if (Auth::check() && Auth::user()->profile_pic_url != null)
+                                        <img src={{ Auth::user()->profile_pic_url }}
+                                            alt="Desk with leather desk pad, walnut desk organizer, wireless keyboard and mouse, and porcelain mug."
+                                            class="object-cover object-center">
+                                    @else
+                                        <img src="https://tailwindui.com/img/ecommerce-images/home-page-02-edition-01.jpg"
+                                            alt="Desk with leather desk pad, walnut desk organizer, wireless keyboard and mouse, and porcelain mug."
+                                            class="object-cover object-center">
+                                    @endif
                                 </div>
-                                <div class="flex justify-end mt-6">
-                                    
-
-                                    <a href="{{ route('posts.index') }}">
-                                        <x-secondary-button x-on:click="$dispatch('close')"> {{ __('Cancel') }} </x-secondary-button> 
+                                <h3 class="mt-6 text-sm text-gray-500">
+                                    <a href="#">
+                                        <span class="absolute inset-0"></span>
+                                        
+                                        {{-- (Auth::check() && Auth::user()->name != null) ? {{ Auth::user()->name }} : "Guest" --}}
+                                        @if (Auth::check() && Auth::user()->name != null)
+                                            {{ Auth::user()->name }}
+                                        @else
+                                            Guest
+                                        @endif
                                     </a>
+                                </h3>
+                            </div>
 
-                                    <x-primary-button class="ms-3">
-                                        {{ __('Comment') }}
-                                    </x-primary-button>
-                                </div>
+                            <!-- Second column -->
+                            <div class="relative pb-2 group lg:w-10/12">
 
-                            </form>
+                                <form method="post" action="{{ route('comments.add', ['postId' => $post->id]) }}">
+                                    @csrf
+                                    @method('post')
+
+                                    <div>
+                                        <x-text-area id="text" name="text" type="text" class="block w-full h-40 mt-1" placeholder="{{ __('Comment') }}" />
+
+                                        <x-input-error :messages="$errors->commentCreation->get('text')" class="mt-2" />
+                                    </div>
+                                    <div class="flex justify-end mt-6">
+                                        
+
+                                        <a href="{{ route('posts.index') }}">
+                                            <x-secondary-button x-on:click="$dispatch('close')"> {{ __('Cancel') }} </x-secondary-button> 
+                                        </a>
+
+                                        <x-primary-button class="ms-3">
+                                            {{ __('Comment') }}
+                                        </x-primary-button>
+                                    </div>
+
+                                </form>
+
+                            </div>
 
                         </div>
 
                     </div>
-
                 </div>
-            </div>
+
+            @else
+
+                <div class="px-4 pb-5 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    <div class="w-full bg-white h-50 sm:py-2 max-w-screen">
+                        <div class="mt-6 space-y-12 lg:flex lg:gap-x-6 lg:space-y-0">
+                            <!-- First column -->
+                            <div class="relative group lg:w-1/7"></div>
+                            <div class="relative group lg:w-2/7">
+                                <div class="relative w-10 h-2 overflow-hidden bg-white rounded-lg group-hover:opacity-75 sm:h-10">
+                                    @if (Auth::check() && Auth::user()->profile_pic_url != null)
+                                        <img src={{ Auth::user()->profile_pic_url }}
+                                            alt="Desk with leather desk pad, walnut desk organizer, wireless keyboard and mouse, and porcelain mug."
+                                            class="object-cover object-center">
+                                    @else
+                                        <img src="https://tailwindui.com/img/ecommerce-images/home-page-02-edition-01.jpg"
+                                            alt="Desk with leather desk pad, walnut desk organizer, wireless keyboard and mouse, and porcelain mug."
+                                            class="object-cover object-center">
+                                    @endif
+                                </div>
+                                <h3 class="mt-6 text-sm text-gray-500">
+                                    <a href="#">
+                                        <span class="absolute inset-0"></span>
+                                        
+                                        {{-- (Auth::check() && Auth::user()->name != null) ? {{ Auth::user()->name }} : "Guest" --}}
+                                        @if (Auth::check() && Auth::user()->name != null)
+                                            {{ Auth::user()->name }}
+                                        @else
+                                            Guest
+                                        @endif
+                                    </a>
+                                </h3>
+                            </div>
+
+                            <!-- Second column -->
+                            <div class="relative pb-2 group lg:w-10/12">
+
+                                <form method="post" action="{{ route('comments.add', ['postId' => $post->id]) }}">
+                                    @csrf
+                                    @method('post')
+
+                                    <div>
+                                        <x-text-area id="text" name="text" type="text" class="block w-full h-40 mt-1" placeholder="{{ __('Comment') }}" />
+
+                                        <x-input-error :messages="$errors->commentCreation->get('text')" class="mt-2" />
+                                    </div>
+                                  
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                
+            @endif
             
         @endif
 
