@@ -38,6 +38,8 @@ Route::middleware('auth')->group(function () {
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('/posts/details/{id}', [PostController::class, 'details'])->name('posts.details');
 Route::post('/posts', [PostController::class, 'create'])->name('posts.create');
+Route::get('/posts/{id}/edit', [PostController::class, 'edit'])->name('posts.edit');
+Route::get('/posts/update', [PostController::class, 'update'])->name('posts.update');
 
 Route::post('/posts/{postId}/comments/add', [CommentController::class, 'add'])->name('comments.add');
 

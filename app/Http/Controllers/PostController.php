@@ -83,8 +83,6 @@ class PostController extends Controller
         $post->user_id = Auth::id();
         $post->save();
 
-        // return response()->json(['message' => 'Post created successfully', 'post' => $post], 201);
-
         return Redirect::route('posts.index')->with('status', 'post-created');
     }
     
@@ -143,14 +141,23 @@ class PostController extends Controller
 
 
     // Edit a post
-    public function edit(Request $request, $id)
+    public function edit($id)
+    {
+        $post = Post::findOrFail($id);
+        return response()->json(['post' => $post]);
+    }
+
+
+
+    // Edit a post
+    public function update(Request $request, $id)
     {
         $post = Post::findOrFail($id);
         if ($post->user_id !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $request->validate([
+        $request->validateWithBag('postUpdate',[
             'title' => 'required|string',
             'body' => 'required|string',
         ]);
@@ -159,8 +166,11 @@ class PostController extends Controller
         $post->body = $request->body;
         $post->save();
 
-        return response()->json(['message' => 'Post updated successfully', 'post' => $post], 200);
+        return Redirect::route('posts.index')->with('status', 'post-updated');
     }
+
+
+
 
     // Delete a post
     public function delete($id)
