@@ -64,3 +64,9 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+- Mailpit is used for the local sending of emails.
+- The use of Jobs queue for handling emails (verification emails, email notification to authors of a post on each comment)
+- The database queue is being used
+-  Use `php artisan queue:work` to handle the background processing of the jobs

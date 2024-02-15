@@ -74,9 +74,13 @@ class CommentController extends Controller
         
         $post = $this->getPostdetails($postId);
 
-        return Redirect::route('posts.details', ['id' => $post->id])->with('post', $post);
+        //handle author notification on the comment of his/her post
+        $mailController = new MailController();
+        $mailController->notifyNewCommentEmail($post->user->email, $post->title, $request->text);
 
+        return Redirect::route('posts.details', ['id' => $post->id])->with('post', $post);
     }
+    
 
     // Edit a comment
     public function edit(Request $request, $id)
