@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\MailController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -48,5 +49,7 @@ Route::post('/posts/{postId}/like/remove', [PostController::class, 'unlikePost']
 
 Route::post('/comments/{commentId}/like/add', [CommentController::class, 'likeComment'])->name('comments.likeComment');
 Route::post('/comments/{commentId}/like/remove', [CommentController::class, 'unlikeComment'])->name('comments.unlikeComment');
+
+Route::get('/posts/send-email', [MailController::class, 'notifyNewCommentEmail'])->name('posts.notifyNewCommentEmail');
 
 require __DIR__.'/auth.php';
