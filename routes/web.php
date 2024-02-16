@@ -37,6 +37,9 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
+Route::get('/posts/search', [PostController::class, 'search'])->name('posts.search');
+Route::post('/posts/search', [PostController::class, 'search'])->name('posts.search');
+
 Route::get('/posts/details/{id}', [PostController::class, 'details'])->name('posts.details');
 Route::post('/posts', [PostController::class, 'create'])->name('posts.create');
 Route::get('/posts/{id}/edit', [PostController::class, 'edit'])->name('posts.edit');

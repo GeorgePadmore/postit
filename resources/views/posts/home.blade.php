@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="pb-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div class="max-w-2xl pb-4 mx-auto sm:px-6 lg:px-8">
 
             @if (session('status') === 'post-created')
                 <div class="px-4 py-3 text-teal-900 bg-teal-100 border-t-4 border-teal-500 rounded-b shadow-md"
@@ -24,6 +24,25 @@
                     </div>
                 </div>
             @endif
+
+            {{-- Search Post / Comment --}}
+            <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                <form method="post" action="{{ route('posts.search') }}">
+                    @csrf
+                    @method('post')
+                    <div class="flex items-center p-6">
+                        <input type="text" id="keyword" name="keyword" placeholder="Search post(s) or comment(s)" class="w-full px-4 py-2 border-2 border-gray-300 rounded-l-md focus:outline-none focus:ring focus:border-blue-300 dark:bg-gray-700 dark:text-gray-100" value="{{ isset($keyword) ? $keyword : '' }}">
+                        <button type="submit" class="px-4 py-2 text-white bg-blue-500 rounded-r-md focus:outline-none focus:ring focus:border-blue-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                            </svg>
+
+                        </button>
+                    </div>
+
+                </form>
+                
+            </div>
 
 
             @if (Route::has('login'))
@@ -122,8 +141,6 @@
             </form>
         </x-modal>
 
-
-
         <x-modal name="signin-alert-modal" :show="$errors->postCreation->isNotEmpty()" focusable>
             <div class="p-6">
                 @csrf
@@ -168,11 +185,10 @@
 
 
 
-
         @if ($posts)
             @foreach ($posts as $post)
                 {{-- Posts section --}}
-                <div class="px-4 pb-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div id="post-section" class="max-w-5xl px-4 pb-4 mx-auto sm:px-6 lg:px-8">
                     <div class="w-full bg-white h-50 sm:py-2 max-w-screen">
                         <div class="mt-6 space-y-12 lg:flex lg:gap-x-6 lg:space-y-0">
                             <!-- First column -->
@@ -212,7 +228,6 @@
                                 </p>
 
                                 <div class="flex items-center">
-
 
                                     @if (Route::has('login'))
                                         @auth
@@ -329,16 +344,7 @@
                             </div>
 
                             <div class="relative group lg:w-1/7">
-                                {{-- <a x-data=""
-                                    x-on:click.prevent="$dispatch('open-modal', 'signin-alert-modal')"
-                                    class="flex items-center mr-4 hover:text-blue-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                                    </svg>
-                                </a> --}}
-
+                    
 
                                 <!-- Edit & Delete Dropdown Only if no one has commented -->
                                 @if ($post->user->id == Auth::id() && $post->comments->count() < 1)
@@ -398,6 +404,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
+
             $('.edit-post-btn').click(function() {
                 var postId = $(this).data('post-id');
                 
@@ -420,6 +427,8 @@
                 });
             });
         });
+
+
     </script>
 
 </x-app-layout>

@@ -58,7 +58,6 @@ class PostController extends Controller
 
 
     public function index() {
-
         $posts = $this->getActivePosts()->orderBy('posts.created_at','DESC')->get();
 
         // Iterate through each post and check if the current user has liked it
@@ -90,15 +89,26 @@ class PostController extends Controller
     // Search posts by title, body or comments
     public function search(Request $request)
     {
-        $keyword = $request->keyword;
-        $posts = Post::where('title', 'LIKE', "%$keyword%")
-                     ->orWhere('body', 'LIKE', "%$keyword%")
-                     ->orWhereHas('comments', function ($query) use ($keyword) {
-                         $query->where('text', 'LIKE', "%$keyword%");
-                     })
-                     ->get();
-        return response()->json(['posts' => $posts], 200);
+        $request->validate([
+            'keyword' => 'string',
+        ]);
+
+        $keyword = $request->input('keyword');
+
+        $posts = $this->getActivePosts()
+            ->where(function ($query) use ($keyword) {
+                $query->where('title', 'ILIKE', "%$keyword%")
+                    ->orWhere('body', 'ILIKE', "%$keyword%")
+                    ->orWhereHas('comments', function ($query) use ($keyword) {
+                        $query->where('text', 'ILIKE', "%$keyword%");
+                    });
+            })
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('posts.home', compact('posts', 'keyword'));
     }
+
 
 
 

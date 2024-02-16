@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="pb-5 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div class="max-w-4xl pb-5 mx-auto sm:px-6 lg:px-8">
 
             @if (session('status') === 'post-created')
                 <div class="px-4 py-3 text-teal-900 bg-teal-100 border-t-4 border-teal-500 rounded-b shadow-md"
@@ -74,7 +74,7 @@
 
         @if ($post)
             {{-- Posts section --}}
-            <div class="px-4 pb-2 mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div class="max-w-5xl px-4 pb-2 mx-auto sm:px-6 lg:px-8">
                 <div class="w-full bg-white h-50 sm:py-2 max-w-screen">
                     <div class="mt-6 space-y-12 lg:flex lg:gap-x-6 lg:space-y-0">
                         <!-- First column -->
@@ -188,7 +188,7 @@
             @if ($post->comments)
 
                 @foreach ($post->comments as $comment)
-                    <div class="px-4 pb-5 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    <div class="max-w-5xl px-4 pb-5 mx-auto sm:px-6 lg:px-8">
                         <div class="w-full bg-white h-50 sm:py-2 max-w-screen">
                             <div class="mt-6 space-y-12 lg:flex lg:gap-x-6 lg:space-y-0">
                                 <!-- First column -->
@@ -300,7 +300,7 @@
 
             @if (Auth::check())
 
-                <div class="px-4 pb-5 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div class="max-w-5xl px-4 pb-5 mx-auto sm:px-6 lg:px-8">
                     <div class="w-full bg-white h-50 sm:py-2 max-w-screen">
                         <div class="mt-6 space-y-12 lg:flex lg:gap-x-6 lg:space-y-0">
                             <!-- First column -->
@@ -366,7 +366,7 @@
 
             @else
 
-                <div class="px-4 pb-5 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div class="max-w-5xl px-4 pb-5 mx-auto sm:px-6 lg:px-8">
                     <div class="w-full bg-white h-50 sm:py-2 max-w-screen">
                         <div class="mt-6 space-y-12 lg:flex lg:gap-x-6 lg:space-y-0">
                             <!-- First column -->
@@ -400,18 +400,10 @@
                             <!-- Second column -->
                             <div class="relative pb-2 group lg:w-10/12">
 
-                                <form method="post" action="{{ route('comments.add', ['postId' => $post->id]) }}">
-                                    @csrf
-                                    @method('post')
-
-                                    <div>
-                                        <x-text-area id="text" name="text" type="text" class="block w-full h-40 mt-1" placeholder="{{ __('Comment') }}" />
-
-                                        <x-input-error :messages="$errors->commentCreation->get('text')" class="mt-2" />
-                                    </div>
-                                  
-
-                                </form>
+                                <div>
+                                    <p class="pb-5 text-sm text-gray-500"> Login / Signup in order to comment on this post. </p>
+                                    <x-input-error :messages="$errors->commentCreation->get('text')" class="mt-2" />
+                                </div>
 
                             </div>
 
