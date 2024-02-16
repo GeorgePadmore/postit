@@ -29,31 +29,34 @@
         </div>
 
 
-        <x-modal name="create-post-modal" :show="$errors->postCreation->isNotEmpty()" focusable>
-            <form method="post" action="{{ route('posts.create') }}" class="p-6">
+        <x-modal name="edit-post-modal" id="edit-post-modal" :show="$errors->postUpdate->isNotEmpty()" focusable>
+            <form method="post" action="{{ route('posts.update') }}" class="p-6">
                 @csrf
                 @method('post')
 
                 <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                    {{ __('Create a Post') }}
+                    {{ __('Update Post') }}
                 </h2>
 
-                <div class="mt-6">
-                    <x-input-label for="title" value="{{ __('Title') }}" class="sr-only" />
+                <!-- Hidden input field for post ID -->
+                <input type="hidden" name="postId" id="postId">
 
-                    <x-text-input id="title" name="title" type="text" class="block w-full mt-1"
+                <div class="mt-6">
+                    <x-input-label for="editTitle" value="{{ __('Title') }}" class="sr-only" />
+
+                    <x-text-input id="editTitle" name="editTitle" type="text" class="block w-full mt-1"
                         placeholder="{{ __('Title') }}" />
 
-                    <x-input-error :messages="$errors->postCreation->get('title')" class="mt-2" />
+                    <x-input-error :messages="$errors->postUpdate->get('editTitle')" class="mt-2" />
                 </div>
 
                 <div class="mt-6">
-                    <x-input-label for="body" value="{{ __('Description') }}" class="sr-only" />
+                    <x-input-label for="editBody" value="{{ __('Description') }}" class="sr-only" />
 
-                    <x-text-area id="body" name="body" type="text" class="block w-full h-40 mt-1"
+                    <x-text-area id="editBody" name="editBody" type="text" class="block w-full h-40 mt-1"
                         placeholder="{{ __('Description') }}" />
 
-                    <x-input-error :messages="$errors->postCreation->get('body')" class="mt-2" />
+                    <x-input-error :messages="$errors->postUpdate->get('editBody')" class="mt-2" />
                 </div>
 
                 <div class="flex justify-end mt-6">
@@ -69,6 +72,40 @@
             </form>
         </x-modal>
 
+
+         <x-modal name="edit-comment-modal" id="edit-comment-modal" :show="$errors->commentUpdate->isNotEmpty()" focusable>
+            <form method="post" action="{{ route('comments.update') }}" class="p-6">
+                @csrf
+                @method('post')
+
+                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                    {{ __('Update Comment') }}
+                </h2>
+
+                <!-- Hidden input field for post ID -->
+                <input type="hidden" name="commentId" id="commentId">
+
+                <div class="mt-6">
+                    <x-input-label for="editComment" value="{{ __('Description') }}" class="sr-only" />
+
+                    <x-text-area id="editComment" name="editComment" type="text" class="block w-full h-40 mt-1"
+                        placeholder="{{ __('Comment') }}" />
+
+                    <x-input-error :messages="$errors->commentUpdate->get('editComment')" class="mt-2" />
+                </div>
+
+                <div class="flex justify-end mt-6">
+                    <x-secondary-button x-on:click="$dispatch('close')">
+                        {{ __('Cancel') }}
+                    </x-secondary-button>
+
+                    <x-primary-button class="ms-3">
+                        {{ __('Update Comment') }}
+                    </x-primary-button>
+                </div>
+
+            </form>
+        </x-modal>
 
 
 
@@ -177,7 +214,49 @@
 
                         </div>
 
-                        <div class="relative group lg:w-1/7"></div>
+                        <div class="relative group lg:w-1/7">
+                    
+                                <!-- Edit & Delete Dropdown Only if no one has commented -->
+                                @if ($post->user->id == Auth::id() && $post->comments->count() < 1)
+
+                                    <div class="hidden sm:flex sm:items-center sm:ms-6">
+                                        <x-dropdown align="right" width="48">
+                                            <x-slot name="trigger">
+                                                <button class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out bg-white border border-transparent rounded-md dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none">
+                                                    <div class="ms-1">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                            stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                                        </svg>
+                                                    </div>
+                                                </button>
+                                            </x-slot>
+
+                                            <x-slot name="content">
+                                                
+                                                <x-new-dropdown-link class="edit-post-btn" x-data="" data-post-id="{{ $post->id }}" x-on:click.prevent="$dispatch('open-modal', 'edit-post-modal')">
+                                                    {{ __('Edit') }}
+                                                </x-new-dropdown-link>
+
+                                                <!-- Authentication -->
+                                                <form method="POST" action="{{ route('posts.delete', ['id' => $post->id]) }}">
+                                                    @csrf
+
+                                                    <x-dropdown-link :href="route('logout')"
+                                                        onclick="event.preventDefault();
+                                                    this.closest('form').submit();">
+                                                        {{ __('Delete') }}
+                                                    </x-dropdown-link>
+                                                </form>
+
+                                            </x-slot>
+                                        </x-dropdown>
+                                    </div>
+                                    
+                                @endif
+
+                            </div>
 
 
                     </div>
@@ -281,7 +360,49 @@
 
                                 </div>
 
-                                <div class="relative group lg:w-1/7"></div>
+                                <div class="relative group lg:w-1/7">
+                    
+                                <!-- Edit & Delete Dropdown Only if no one has commented -->
+                                @if ($comment->user->id == Auth::id())
+
+                                    <div class="hidden sm:flex sm:items-center sm:ms-6">
+                                        <x-dropdown align="right" width="48">
+                                            <x-slot name="trigger">
+                                                <button class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out bg-white border border-transparent rounded-md dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none">
+                                                    <div class="ms-1">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                            stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                                        </svg>
+                                                    </div>
+                                                </button>
+                                            </x-slot>
+
+                                            <x-slot name="content">
+                                                
+                                                <x-dropdown-link class="edit-comment-btn" x-data="" data-comment-id="{{ $comment->id }}" x-on:click.prevent="$dispatch('open-modal', 'edit-comment-modal')">
+                                                    {{ __('Edit') }}
+                                                </x-new-dropdown-link>
+
+                                                <!-- Authentication -->
+                                                <form method="POST" action="{{ route('posts.delete', ['id' => $post->id]) }}">
+                                                    @csrf
+
+                                                    <x-dropdown-link :href="route('logout')"
+                                                        onclick="event.preventDefault();
+                                                    this.closest('form').submit();">
+                                                        {{ __('Delete') }}
+                                                    </x-dropdown-link>
+                                                </form>
+
+                                            </x-slot>
+                                        </x-dropdown>
+                                    </div>
+                                    
+                                @endif
+
+                            </div>
 
 
                             </div>
@@ -387,7 +508,6 @@
                                     <a href="#">
                                         <span class="absolute inset-0"></span>
                                         
-                                        {{-- (Auth::check() && Auth::user()->name != null) ? {{ Auth::user()->name }} : "Guest" --}}
                                         @if (Auth::check() && Auth::user()->name != null)
                                             {{ Auth::user()->name }}
                                         @else
@@ -417,5 +537,57 @@
         @endif
 
     </div>
+
+
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+
+            $('.edit-comment-btn').click(function() {
+                
+                var commentId = $(this).data('comment-id');
+                
+                // Send Ajax request to fetch comment details
+                $.ajax({
+                    url: '/comments/' + commentId + '/edit',
+                    type: 'GET',
+                    success: function(response) {
+                        // Update form fields with fetched post details
+                        $('#editComment').val(response.comment.text);
+                        $('#commentId').val(commentId);
+                        
+                    },
+                    error: function(xhr) {
+                        console.log(xhr.responseText);
+                    }
+                });
+                
+            });
+
+
+            $('.edit-post-btn').click(function() {
+                
+                var postId = $(this).data('post-id');
+                
+                // Send Ajax request to fetch post details
+                $.ajax({
+                    url: '/posts/' + postId + '/edit',
+                    type: 'GET',
+                    success: function(response) {
+                        // Update form fields with fetched post details
+                        $('#editTitle').val(response.post.title);
+                        $('#editBody').val(response.post.body);
+                        $('#postId').val(postId);
+                        
+                    },
+                    error: function(xhr) {
+                        console.log(xhr.responseText);
+                    }
+                });
+            });
+        });
+
+
+    </script>
 
 </x-app-layout>

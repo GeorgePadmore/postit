@@ -106,7 +106,7 @@
             </form>
         </x-modal>
 
-        <x-modal name="edit-post-modal" :show="$errors->postUpdate->isNotEmpty()" focusable>
+        <x-modal name="edit-post-modal" id="edit-post-modal" :show="$errors->postUpdate->isNotEmpty()" focusable>
             <form method="post" action="{{ route('posts.update') }}" class="p-6">
                 @csrf
                 @method('post')
@@ -115,22 +115,25 @@
                     {{ __('Update Post') }}
                 </h2>
 
-                <div class="mt-6">
-                    <x-input-label for="title" value="{{ __('Title') }}" class="sr-only" />
+                <!-- Hidden input field for post ID -->
+                <input type="hidden" name="postId" id="postId">
 
-                    <x-text-input id="title" name="title" type="text" class="block w-full mt-1"
+                <div class="mt-6">
+                    <x-input-label for="editTitle" value="{{ __('Title') }}" class="sr-only" />
+
+                    <x-text-input id="editTitle" name="editTitle" type="text" class="block w-full mt-1"
                         placeholder="{{ __('Title') }}" />
 
-                    <x-input-error :messages="$errors->postUpdate->get('title')" class="mt-2" />
+                    <x-input-error :messages="$errors->postUpdate->get('editTitle')" class="mt-2" />
                 </div>
 
                 <div class="mt-6">
-                    <x-input-label for="body" value="{{ __('Description') }}" class="sr-only" />
+                    <x-input-label for="editBody" value="{{ __('Description') }}" class="sr-only" />
 
-                    <x-text-area id="body" name="body" type="text" class="block w-full h-40 mt-1"
+                    <x-text-area id="editBody" name="editBody" type="text" class="block w-full h-40 mt-1"
                         placeholder="{{ __('Description') }}" />
 
-                    <x-input-error :messages="$errors->postUpdate->get('body')" class="mt-2" />
+                    <x-input-error :messages="$errors->postUpdate->get('editBody')" class="mt-2" />
                 </div>
 
                 <div class="flex justify-end mt-6">
@@ -350,7 +353,6 @@
 
                             <div class="relative group lg:w-1/7">
                     
-
                                 <!-- Edit & Delete Dropdown Only if no one has commented -->
                                 @if ($post->user->id == Auth::id() && $post->comments->count() < 1)
 
@@ -370,12 +372,12 @@
 
                                             <x-slot name="content">
                                                 
-                                                <x-new-dropdown-link x-data="" data-post-id="{{ $post->id }}">
+                                                <x-new-dropdown-link class="edit-post-btn" x-data="" data-post-id="{{ $post->id }}" x-on:click.prevent="$dispatch('open-modal', 'edit-post-modal')">
                                                     {{ __('Edit') }}
                                                 </x-new-dropdown-link>
 
                                                 <!-- Authentication -->
-                                                <form method="POST" action="{{ route('logout') }}">
+                                                <form method="POST" action="{{ route('posts.delete', ['id' => $post->id]) }}">
                                                     @csrf
 
                                                     <x-dropdown-link :href="route('logout')"
@@ -390,7 +392,6 @@
                                     </div>
                                     
                                 @endif
-
 
                             </div>
 
@@ -411,6 +412,7 @@
         $(document).ready(function() {
 
             $('.edit-post-btn').click(function() {
+                
                 var postId = $(this).data('post-id');
                 
                 // Send Ajax request to fetch post details
@@ -418,13 +420,11 @@
                     url: '/posts/' + postId + '/edit',
                     type: 'GET',
                     success: function(response) {
-                        console.log("Hi");
                         // Update form fields with fetched post details
-                        $('#title').val(response.post.title);
-                        $('#body').val(response.post.body);
+                        $('#editTitle').val(response.post.title);
+                        $('#editBody').val(response.post.body);
+                        $('#postId').val(postId);
                         
-                        // Show the modal
-                        $('#edit-post-modal').modal('show');
                     },
                     error: function(xhr) {
                         console.log(xhr.responseText);

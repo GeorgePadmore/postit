@@ -160,20 +160,22 @@ class PostController extends Controller
 
 
     // Edit a post
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        $post = Post::findOrFail($id);
+    
+        $request->validateWithBag('postUpdate',[
+            'editTitle' => 'required|string',
+            'editBody' => 'required|string',
+            'postId' => 'required',
+        ]);
+
+        $post = Post::findOrFail($request->postId);
         if ($post->user_id !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $request->validateWithBag('postUpdate',[
-            'title' => 'required|string',
-            'body' => 'required|string',
-        ]);
-
-        $post->title = $request->title;
-        $post->body = $request->body;
+        $post->title = $request->editTitle;
+        $post->body = $request->editBody;
         $post->save();
 
         return Redirect::route('posts.index')->with('status', 'post-updated');
@@ -190,7 +192,7 @@ class PostController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         $post->delete();
-        return response()->json(['message' => 'Post deleted successfully'], 200);
+        return Redirect::route('posts.index')->with('status', 'post-updated');
     }
 
 

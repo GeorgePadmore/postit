@@ -80,24 +80,39 @@ class CommentController extends Controller
 
         return Redirect::route('posts.details', ['id' => $post->id])->with('post', $post);
     }
-    
 
-    // Edit a comment
-    public function edit(Request $request, $id)
+
+    public function edit($id)
     {
         $comment = Comment::findOrFail($id);
-        if ($comment->user_id !== Auth::id()) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        return response()->json(['comment' => $comment]);
+    }
+
+    public function update(Request $request)
+    {
+        try {
+    
+            $request->validateWithBag('commentUpdate',[
+                'editComment' => 'required|string',
+                'commentId' => 'required',
+            ]);
+
+            $comment = Comment::findOrFail($request->commentId);
+            if ($comment->user_id !== Auth::id()) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            $comment->text = $request->editComment;
+            $comment->save();
+
+            $post = $this->getPostdetails($comment->post_id);
+            return Redirect::route('posts.details', ['id' => $comment->post_id])->with('post', $post);
+
+        } catch (\Exception $e) {
+            // Handle the exception as needed
+            return response()->json(['error' => 'An error occurred while processing the request'], 500);
         }
 
-        $request->validate([
-            'text' => 'required|string',
-        ]);
-
-        $comment->text = $request->text;
-        $comment->save();
-
-        return response()->json(['message' => 'Comment updated successfully', 'comment' => $comment], 200);
     }
 
     // Delete a comment
