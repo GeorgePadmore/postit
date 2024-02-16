@@ -53,6 +53,7 @@ Route::post('/posts/{postId}/like/remove', [PostController::class, 'unlikePost']
 
 Route::get('/comments/{id}/edit', [CommentController::class, 'edit'])->name('comments.edit');
 Route::post('/comments/update', [CommentController::class, 'update'])->name('comments.update');
+Route::post('/comments/delete/{id}', [CommentController::class, 'delete'])->name('comments.delete');
 
 Route::post('/comments/{commentId}/like/add', [CommentController::class, 'likeComment'])->name('comments.likeComment');
 Route::post('/comments/{commentId}/like/remove', [CommentController::class, 'unlikeComment'])->name('comments.unlikeComment');

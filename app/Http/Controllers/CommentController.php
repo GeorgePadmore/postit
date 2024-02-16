@@ -123,7 +123,9 @@ class CommentController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         $comment->delete();
-        return response()->json(['message' => 'Comment deleted successfully'], 200);
+
+        $post = $this->getPostdetails($comment->post_id);
+        return Redirect::route('posts.details', ['id' => $comment->post_id])->with('post', $post);
     }
 
 

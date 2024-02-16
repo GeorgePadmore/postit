@@ -351,7 +351,7 @@
 
                             </div>
 
-                            <div class="relative group lg:w-1/7">
+                            <div class="relative group lg:w-1/7 lg:ml-auto">
                     
                                 <!-- Edit & Delete Dropdown Only if no one has commented -->
                                 @if ($post->user->id == Auth::id() && $post->comments->count() < 1)
@@ -376,16 +376,14 @@
                                                     {{ __('Edit') }}
                                                 </x-new-dropdown-link>
 
-                                                <!-- Authentication -->
-                                                <form method="POST" action="{{ route('posts.delete', ['id' => $post->id]) }}">
-                                                    @csrf
 
-                                                    <x-dropdown-link :href="route('logout')"
-                                                        onclick="event.preventDefault();
-                                                    this.closest('form').submit();">
-                                                        {{ __('Delete') }}
-                                                    </x-dropdown-link>
+                                                <form id="delete-post-form-{{ $post->id }}" method="POST" action="{{ route('posts.delete', ['id' => $post->id]) }}" style="display: none;">
+                                                    @csrf
                                                 </form>
+
+                                                <x-dropdown-link href="#" onclick="confirmDelete('{{ $post->id }}')">
+                                                    {{ __('Delete') }}
+                                                </x-dropdown-link>
 
                                             </x-slot>
                                         </x-dropdown>
@@ -431,7 +429,15 @@
                     }
                 });
             });
+            
         });
+
+
+        function confirmDelete(postId) {
+            if (confirm('Are you sure you want to delete this post?')) {
+                document.getElementById('delete-post-form-' + postId).submit();
+            }
+        }
 
 
     </script>
