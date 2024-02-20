@@ -566,7 +566,7 @@
                 </div>
                 <div>
                     Hey {{ Auth::user()->name }}, Your Email isn't verified!
-                    <a class="underline hover:text-indigo-500" href="#"
+                    <a class="underline hover:text-indigo-500" href="{{ route('verification.send') }}"
                         onclick="event.preventDefault(); document.getElementById('resend-verification-form').submit();">
                         Click Here
                     </a> to Resend.
