@@ -76,11 +76,11 @@ class PostController extends Controller
             'body' => 'required|string',
         ]);
 
-        $post = new Post();
-        $post->title = $request->title;
-        $post->body = $request->body;
-        $post->user_id = Auth::id();
-        $post->save();
+        Post::create([
+            'user_id' => Auth::id(),
+            'title' => $request->title,
+            'body' => $request->body,
+        ]);
 
         return Redirect::route('posts.index')->with('status', 'post-created');
     }

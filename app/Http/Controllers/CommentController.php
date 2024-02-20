@@ -66,11 +66,11 @@ class CommentController extends Controller
             'text' => 'required|string',
         ]);
 
-        $comment = new Comment();
-        $comment->text = $request->text;
-        $comment->user_id = Auth::id();
-        $comment->post_id = $postId;
-        $comment->save();
+        Comment::create([
+            'user_id' => Auth::id(),
+            'text' => $request->text,
+            'post_id' => $postId
+        ]);
         
         $post = $this->getPostdetails($postId);
 

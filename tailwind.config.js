@@ -20,4 +20,5 @@ export default {
     },
 
     plugins: [forms, aspectRatio],
+    darkMode: 'class'
 };
