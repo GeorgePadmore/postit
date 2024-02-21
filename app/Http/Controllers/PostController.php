@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
-use Mockery\Undefined;
+use RealRashid\SweetAlert\Facades\Alert;
+
 
 class PostController extends Controller
 {
@@ -64,7 +65,7 @@ class PostController extends Controller
         $posts->each(function ($post) {
             $post->liked_by_user = $this->getUserPostLike($post->id) !== null;
         });
-
+        
         return view('posts.home', ['posts' => $posts]);
     }
 
@@ -81,6 +82,8 @@ class PostController extends Controller
             'title' => $request->title,
             'body' => $request->body,
         ]);
+
+        Alert::toast('Post created successfully', 'success');
 
         return Redirect::route('posts.index')->with('status', 'post-created');
     }
@@ -178,6 +181,8 @@ class PostController extends Controller
         $post->body = $request->editBody;
         $post->save();
 
+        Alert::toast('Post updated successfully', 'success');
+
         return Redirect::route('posts.index')->with('status', 'post-updated');
     }
 
@@ -192,6 +197,8 @@ class PostController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         $post->delete();
+        Alert::toast('Post deleted successfully', 'success');
+
         return Redirect::route('posts.index')->with('status', 'post-updated');
     }
 

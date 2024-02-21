@@ -49,7 +49,7 @@
 
             
             @auth
-                <x-posts.new-post-button />
+                <x-posts.new-post-button/>
             @endauth
            
         </div>
@@ -728,6 +728,17 @@
                     error: function(xhr) {
                         console.log(xhr.responseText);
                     }
+                });
+            });
+
+
+            $('.post-button-email-unverified').click(function () {
+                // alert("Your email isn't verified.");
+                Swal.fire({
+                    title: 'Unverified Email!',
+                    text: 'Please verify your email in order to make a post.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
                 });
             });
             
