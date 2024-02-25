@@ -14,7 +14,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command(DeleteInactivePosts::class)->daily(); // Run the command daily
+        $schedule->command(DeleteInactivePosts::class)->everyFiveSeconds(); // Run the command daily
+        // $schedule->command(DeleteInactivePosts::class)->daily(); // Run the command daily
     }
 
     /**

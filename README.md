@@ -70,3 +70,4 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - The use of Jobs queue for handling emails (verification emails, email notification to authors of a post on each comment)
 - The database queue is being used
 -  Use `php artisan queue:work` to handle the background processing of the jobs
+- Use `php artisan schedule:run` to run scheduled tasks (auto deleting posts after x period of time)

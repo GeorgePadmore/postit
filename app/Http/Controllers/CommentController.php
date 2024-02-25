@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redirect;
+use Carbon\Carbon;
+Use Alert;
 
 
 class CommentController extends Controller
@@ -62,23 +64,32 @@ class CommentController extends Controller
     // Add a comment to a post
     public function add(Request $request, $postId)
     {
-        $request->validateWithBag('commentCreation',[
-            'text' => 'required|string',
-        ]);
 
-        Comment::create([
-            'user_id' => Auth::id(),
-            'text' => $request->text,
-            'post_id' => $postId
-        ]);
-        
-        $post = $this->getPostdetails($postId);
+        try {
 
-        //handle author notification on the comment of his/her post
-        $mailController = new MailController();
-        $mailController->notifyNewCommentEmail($post->user->email, $post->title, $request->text);
+            $request->validateWithBag('commentCreation',[
+                'text' => 'required|string',
+            ]);
 
-        return Redirect::route('posts.details', ['id' => $post->id])->with('post', $post);
+            Comment::create([
+                'user_id' => Auth::id(),
+                'text' => $request->text,
+                'post_id' => $postId,
+                'created_at' => Carbon::now()
+            ]);
+            
+            $post = $this->getPostdetails($postId);
+
+            //handle author notification on the comment of his/her post
+            $mailController = new MailController();
+            $mailController->notifyNewCommentEmail($post->user->email, $post->title, $request->text);
+
+            return Redirect::route('posts.details', ['id' => $post->id])->with('post', $post);
+        } catch (\Exception $e) {
+            // Handle the exception as needed
+            toast('Your comment could not be saved. Please try again','warning');
+            return Redirect::route('posts.details', ['id' => $postId]);
+        }
     }
 
 
@@ -103,6 +114,8 @@ class CommentController extends Controller
             }
 
             $comment->text = $request->editComment;
+            $comment->updated_at = Carbon::now();
+
             $comment->save();
 
             $post = $this->getPostdetails($comment->post_id);

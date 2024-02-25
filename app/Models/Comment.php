@@ -4,11 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
+
 
 class Comment extends Model
 {
     use HasFactory;
-    protected $fillable = ['text', 'user_id'];
+    protected $fillable = ['text', 'post_id', 'user_id'];
+
+    // Disable automatic management of updated_at timestamp
+    const UPDATED_AT = null;
 
     public function post()
     {
@@ -23,5 +28,10 @@ class Comment extends Model
     public function likesCount()
     {
         return $this->hasOne(CommentLikeCount::class, 'comment_id');
+    }
+
+    public function getUpdatedAtAttribute($value)
+    {
+        return $value ? Carbon::parse($value) : null;
     }
 }

@@ -14,6 +14,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use RealRashid\SweetAlert\Facades\Alert;
+use Carbon\Carbon;
 
 
 class PostController extends Controller
@@ -81,6 +82,7 @@ class PostController extends Controller
             'user_id' => Auth::id(),
             'title' => $request->title,
             'body' => $request->body,
+            'created_at' => Carbon::now()
         ]);
 
         Alert::toast('Post created successfully', 'success');
@@ -179,6 +181,7 @@ class PostController extends Controller
 
         $post->title = $request->editTitle;
         $post->body = $request->editBody;
+        $post->updated_at = Carbon::now();
         $post->save();
 
         Alert::toast('Post updated successfully', 'success');
@@ -197,6 +200,7 @@ class PostController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         $post->delete();
+        
         Alert::toast('Post deleted successfully', 'success');
 
         return Redirect::route('posts.index')->with('status', 'post-updated');

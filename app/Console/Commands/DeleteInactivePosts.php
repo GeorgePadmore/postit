@@ -32,7 +32,7 @@ class DeleteInactivePosts extends Command
 
     public function handle()
     {
-        $thresholdDate = Carbon::now()->subYear();
+        $thresholdDate = Carbon::now()->subMinute();//Carbon::now()->subYear();
         
         // Fetch posts without comments older than one year and soft-delete them
         $postsToDelete = Post::whereDoesntHave('comments')
