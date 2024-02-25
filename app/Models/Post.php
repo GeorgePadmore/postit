@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 
 class Post extends Model
 {
-    use HasFactory;
+    use HasFactory; use Searchable; use SoftDeletes;
     protected $fillable = ['title', 'body', 'user_id'];
 
     // Disable automatic management of updated_at timestamp

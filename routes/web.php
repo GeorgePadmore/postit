@@ -20,6 +20,24 @@ use Illuminate\Http\Request;
 |
 */
 
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+ 
+    return redirect('/home');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+ 
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+
 Route::get('/', function () {
     return redirect('/posts');
 });
@@ -47,8 +65,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/posts/{postId}/comments/add', [CommentController::class, 'add'])->name('comments.add');
 
-    Route::post('/posts/{postId}/like/add', [PostController::class, 'likePost'])->name('posts.likePost');
-    Route::post('/posts/{postId}/like/remove', [PostController::class, 'unlikePost'])->name('posts.unlikePost');
+    Route::post('/posts/{postId}/react/{action}', [PostController::class, 'likeUnlikePost'])->name('posts.react');
 
     Route::get('/comments/{id}/edit', [CommentController::class, 'edit'])->name('comments.edit');
     Route::post('/comments/update', [CommentController::class, 'update'])->name('comments.update');
@@ -70,19 +87,13 @@ Route::get('/posts/send-email', [MailController::class, 'notifyNewCommentEmail']
 
 require __DIR__.'/auth.php';
 
-Route::get('/email/verify', function () {
-    return view('auth.verify-email');
-})->middleware('auth')->name('verification.notice');
-
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
- 
-    return redirect('/home');
-})->middleware(['auth', 'signed'])->name('verification.verify');
 
 
-Route::post('/email/verification-notification', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
- 
-    return back()->with('message', 'Verification link sent!');
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+// Route::get('search', function() {
+//     $query = ''; // <-- Change the query for testing.
+
+//     $articles = App\Article::search($query)->get();
+
+//     return $articles;
+// });

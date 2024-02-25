@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
@@ -9,7 +10,7 @@ use Carbon\Carbon;
 
 class Comment extends Model
 {
-    use HasFactory;
+    use HasFactory; use Searchable;
     protected $fillable = ['text', 'post_id', 'user_id'];
 
     // Disable automatic management of updated_at timestamp

@@ -7,91 +7,51 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Models\CommentLike;
 use App\Models\CommentLikeCount;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-Use Alert;
-
 
 class CommentController extends Controller
 {
-
-    private function getActivePosts(){
-        return Post::select('posts.*', 'post_likes_count.total_likes')
-            ->leftJoin('post_likes_count', 'posts.id', '=', 'post_likes_count.post_id')
-            ->where([
-                ['posts.active_status', true],
-                ['posts.del_status', false]
-            ]);
-    }
-
-
-    private function getCommentLikeCount($commentId){
-        return CommentLikeCount::where([
-             ['comment_id', $commentId]
-        ])->first();
-    }
-    
-    
-
-
-    public function getPostdetails($id)
+    private function getActivePosts()
     {
-        // Define validation rules
-        $validator = Validator::make(['id' => $id], [
-            'id' => 'required|integer|exists:posts,id',
-        ]);
-
-        // Check if validation fails
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        // Validation passed, proceed with retrieving the post
-        $post = $this->getActivePosts()->find($id);
-
-        if (!$post) {
-            // Post not found, handle the error (e.g., return 404)
-            abort(404);
-        }
-
-        return $post;
-
+        return Post::where([
+            ['active_status', true],
+            ['del_status', false]
+        ])->get();
     }
 
-    // Add a comment to a post
+    private function getPostDetails($postId)
+    {
+        return Post::findOrFail($postId);
+    }
+
     public function add(Request $request, $postId)
     {
+        $request->validate([
+            'text' => 'required|string',
+        ]);
 
         try {
-
-            $request->validateWithBag('commentCreation',[
-                'text' => 'required|string',
-            ]);
-
             Comment::create([
                 'user_id' => Auth::id(),
                 'text' => $request->text,
                 'post_id' => $postId,
                 'created_at' => Carbon::now()
             ]);
-            
-            $post = $this->getPostdetails($postId);
 
-            //handle author notification on the comment of his/her post
+            $post = $this->getPostDetails($postId);
+
+            // Handle author notification on the comment of his/her post
             $mailController = new MailController();
             $mailController->notifyNewCommentEmail($post->user->email, $post->title, $request->text);
 
-            return Redirect::route('posts.details', ['id' => $post->id])->with('post', $post);
+            return redirect()->route('posts.details', ['id' => $post->id])->with('post', $post);
         } catch (\Exception $e) {
-            // Handle the exception as needed
-            toast('Your comment could not be saved. Please try again','warning');
-            return Redirect::route('posts.details', ['id' => $postId]);
+            toast('Your comment could not be saved. Please try again', 'warning');
+            return redirect()->route('posts.details', ['id' => $postId]);
         }
     }
-
 
     public function edit($id)
     {
@@ -101,34 +61,30 @@ class CommentController extends Controller
 
     public function update(Request $request)
     {
-        try {
-    
-            $request->validateWithBag('commentUpdate',[
-                'editComment' => 'required|string',
-                'commentId' => 'required',
-            ]);
+        $request->validate([
+            'editComment' => 'required|string',
+            'commentId' => 'required',
+        ]);
 
+        try {
             $comment = Comment::findOrFail($request->commentId);
             if ($comment->user_id !== Auth::id()) {
+                toast('Unauthorized', 'warning');
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
 
             $comment->text = $request->editComment;
             $comment->updated_at = Carbon::now();
-
             $comment->save();
 
-            $post = $this->getPostdetails($comment->post_id);
-            return Redirect::route('posts.details', ['id' => $comment->post_id])->with('post', $post);
-
+            $post = $this->getPostDetails($comment->post_id);
+            return redirect()->route('posts.details', ['id' => $comment->post_id])->with('post', $post);
         } catch (\Exception $e) {
-            // Handle the exception as needed
+            toast('An error occurred while processing the request', 'warning');
             return response()->json(['error' => 'An error occurred while processing the request'], 500);
         }
-
     }
 
-    // Delete a comment
     public function delete($id)
     {
         $comment = Comment::findOrFail($id);
@@ -137,106 +93,54 @@ class CommentController extends Controller
         }
         $comment->delete();
 
-        $post = $this->getPostdetails($comment->post_id);
-        return Redirect::route('posts.details', ['id' => $comment->post_id])->with('post', $post);
+        $post = $this->getPostDetails($comment->post_id);
+        return redirect()->route('posts.details', ['id' => $comment->post_id])->with('post', $post);
     }
 
-
-
-    // Like a comment
     public function likeComment($commentId)
     {
-       
-        // Start a database transaction
-        DB::beginTransaction();
-
         try {
-             // Check if the comment exists
             $comment = Comment::findOrFail($commentId);
-
-
-            // Check if the user has already liked the comment
             $existingLike = CommentLike::where('user_id', Auth::id())->where('comment_id', $commentId)->first();
 
             if ($existingLike) {
-                return response()->json(['message' => 'You have already liked this comment'], 400);
+                toast('You have already liked this comment', 'warning');
             }
 
-            // Add a like for the comment
-            CommentLike::create([ 'user_id' => Auth::id(), 'comment_id' => $commentId, ]);
+            CommentLike::create(['user_id' => Auth::id(), 'comment_id' => $commentId]);
 
-            $commentLike = $this->getCommentLikeCount($commentId);
+            $commentLike = CommentLikeCount::firstOrNew(['comment_id' => $commentId]);
+            $commentLike->total_likes++;
+            $commentLike->save();
 
-            if($commentLike == null){
-                CommentLikeCount::create([ 'comment_id' => $commentId, 'total_likes' => 1 ]);
-            }else{
-                // Update the total likes count for the comment
-                CommentLikeCount::where([
-                    ['comment_id', $commentId],
-                ])->update(['total_likes' => DB::raw('total_likes + 1')]);
-            }
-
-            // Commit the transaction
-            DB::commit();
-
-            $post = $this->getPostdetails($comment->post_id);
-            return Redirect::route('posts.details', ['id' => $post->id])->with('post', $post);
-
-
+            $post = $this->getPostDetails($comment->post_id);
+            return redirect()->route('posts.details', ['id' => $post->id])->with('post', $post);
         } catch (\Exception $e) {
-            // Something went wrong, rollback the transaction
-            DB::rollback();
-            // Handle the exception as needed
-            return response()->json(['error' => 'An error occurred while processing the request'], 500);
+            toast('An error occurred while processing the request', 'warning');
         }
-
-
     }
 
-    // Unlike a comment
     public function unlikeComment($commentId)
     {
-        
-        // Start a database transaction
-        DB::beginTransaction();
-
         try {
-             // Check if the comment exists
-            $comment = Comment::findOrFail($commentId);
-
-
-            // Check if the user has liked the comment
             $existingLike = CommentLike::where('user_id', Auth::id())->where('comment_id', $commentId)->first();
 
             if (!$existingLike) {
-                return response()->json(['message' => 'You have not liked this comment'], 400);
+                toast('You have not liked this comment', 'warning');
             }
 
-            // Remove the like for the comment
             $existingLike->delete();
 
-
-            // Update the total likes count for the comment
             $likeCount = CommentLikeCount::where('comment_id', $commentId)->first();
             if ($likeCount) {
-                $likeCount->update(['total_likes' => DB::raw('total_likes - 1')]);
+                $likeCount->total_likes--;
+                $likeCount->save();
             }
-        
-            // Commit the transaction
-            DB::commit();
 
-            $post = $this->getPostdetails($comment->post_id);
-            return Redirect::route('posts.details', ['id' => $post->id])->with('post', $post);
-
+            $post = $this->getPostDetails($existingLike->comment->post_id);
+            return redirect()->route('posts.details', ['id' => $post->id])->with('post', $post);
         } catch (\Exception $e) {
-            // Something went wrong, rollback the transaction
-            DB::rollback();
-            // Handle the exception as needed
-            return response()->json(['error' => 'An error occurred while processing the request'], 500);
+            toast('An error occurred while processing the request', 'warning');
         }
-
-
     }
-
-
 }
